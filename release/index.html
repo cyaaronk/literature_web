@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Grace's World</title>
+<meta name="viewport" content="width=device-width"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+var xmlhttp;
+
+function get_info()
+{   
+    if (window.XMLHttpRequest) {
+    // code for IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp = new XMLHttpRequest();
+    }
+    else {
+    // code for IE6, IE5
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+	if (this.readyState == 4 && this.status == 200) {
+            var jsonResponse = JSON.parse(this.responseText);
+            document.getElementById("twitter").href = jsonResponse.twitter;
+	}
+    };
+    xmlhttp.open("GET","info.php",true);
+    xmlhttp.send();
+}
+
+// get catalogue
+var cq = 1;
+var catamaxp = 0;
+function open_cata(x)
+{
+    if(cq <= 1 && x < 0) x = 0;
+    if(catamaxp == 1 && x > 0) x = 0;
+    cq += x;
+    console.log(cq);
+    
+    if (window.XMLHttpRequest) {
+    // code for IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp = new XMLHttpRequest();
+    }
+    else {
+    // code for IE6, IE5
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+	if (this.readyState == 4 && this.status == 200) {
+            var jsonResponse = JSON.parse(this.responseText);
+            document.getElementById("div2b").innerHTML = jsonResponse.welcomeletter;
+            document.getElementById("div2d").innerHTML = jsonResponse.catalogue;
+            catamaxp = jsonResponse.catamaxp;
+	}
+    };
+    xmlhttp.open("GET","catalogue.php?q="+cq,true);
+    xmlhttp.send();
+    
+    if(x != 0)
+        {
+            $('html,body').animate({
+                scrollTop: $('#section2').position().top}, 1000 );
+            $("#div2c").fadeTo(100, 0, function(){$("#div2c").fadeTo(500, 1);} );
+            $("#div2d").fadeTo(100, 0, function(){$("#div2d").fadeTo(500, 1);} );
+            document.getElementById("letter_open").play();
+            document.getElementById("div2d").innerHTML = "<i class='fa fa-spinner fa-spin'>";
+        }
+}
+window.onload = function(){get_info(); open_cata(0);};
+
+var pagemo = 0;
+var pagecid = 0;
+var pagemax = 0;
+var nextpagecid = 0;
+var prevpagecid = 0;
+function open_letter(cid, x = 0)
+{
+    var newchap = 0;
+    if(cid == -1) cid = pagecid;
+    else {pagecid = cid; newchap = 1;} 
+    
+    if(pagemo <= 0 && x < 0) x = 0;
+    if(pagemax == 1 && x > 0) x = 0;
+    pagemo += x;
+    if (pagemo < 0) console.log("error -> open_letter(): pagemo < 0!");
+    
+	document.getElementById("section3").style.display="block";
+
+	// get passage
+	if (window.XMLHttpRequest) {
+	// code for IE7+, Firefox, Chrome, Opera, Safari
+	xmlhttp = new XMLHttpRequest();
+	}
+	else {
+	// code for IE6, IE5
+	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+        
+	xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var jsonResponse = JSON.parse(this.responseText);
+                
+                document.getElementById("div3b").innerHTML = jsonResponse.passage;
+                pagemax = jsonResponse.pagemax;
+                nextpagecid = jsonResponse.nextpagecid;
+                prevpagecid = jsonResponse.prevpagecid;
+
+            }
+	};
+	xmlhttp.open("GET","passages.php?q="+cid+"&w="+pagemo,true);
+	xmlhttp.send();
+        if(x != 0 || newchap == 1)
+        {
+            $('html,body').animate({
+                scrollTop: $('#section3').position().top}, 1000 );
+            $("#div3a").fadeTo(100, 0, function(){$("#div3a").fadeTo(500, 1);} );
+            $("#div3b").fadeTo(100, 0, function(){$("#div3b").fadeTo(500, 1);} );
+            document.getElementById("letter_open").play();
+            document.getElementById("div3b").innerHTML = "<i class='fa fa-spinner fa-spin'>";
+        }
+}
+
+function next_letter(x)
+{
+    if(x == 1 && nextpagecid != 0) open_letter(nextpagecid);
+    if(x == -1 && prevpagecid != 0) open_letter(prevpagecid);
+}
+
+function open_catalogue()
+{
+    document.getElementById("div2a").style.visibility="hidden";
+    document.getElementById("div2b").style.visibility="hidden";
+    document.getElementById("div2c").style.visibility="visible";
+    document.getElementById("div2c").className += " w3-animate-bottom_div2c";
+    document.getElementById("div2d").style.visibility="visible";
+    document.getElementById("div2d").className += " w3-animate-bottom_div2d";
+    document.getElementById("letter_open").play();
+    document.getElementById("div2e").style.display="inline-block";
+    document.getElementById("div2f").style.display="inline-block";
+}
+
+function toggle_login()
+{
+	$("#adminlogin2").fadeToggle();
+}
+</script>
+<style>
+html {
+    overflow-x: hidden;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    min-width: 700px;
+}
+section {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+footer
+{
+    width: auto;
+    text-align:center;
+    text-align:center!important;
+    background-color: black;
+    opacity:0.60;
+    padding-top:64px!important;padding-bottom:64px!important;
+}
+footer:hover{opacity:0.9}
+#section1
+{
+    //min-width: 369px;
+    min-height: 227px;
+}
+#section2
+{
+    //min-width: 540px;
+    min-height: 600px;
+}
+#section3
+{
+    //min-width: 757px;
+    min-height: 1000px;
+    display: none;
+}
+.bg-wrap {
+    clip: rect(0, auto, auto, 0);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.bg {
+    position: fixed;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    transform: translateZ(0);
+    will-change: transform;
+}
+.cardf
+{
+	font: 18px monospace;
+	font-weight: lighter;
+  	color: #505e5e;
+}
+.cataf
+{
+	font: 15px monospace;
+  	color: #505e5e;
+}
+.catahf
+{
+	font: 15px monospace;
+	font-weight: bold;
+  	color: #505e5e;
+}
+.w3-animate-bottom_div2c{position:relative;animation:animatebottom_div2c 1s}@keyframes animatebottom_div2c{from{transform: translate(30px, 0px);opacity:0} to{transform: translate(30px, -310px);opacity:1}}
+.w3-animate-bottom_div2d{position:relative;animation:animatebottom_div2d 1s}@keyframes animatebottom_div2d{from{transform: translate(160px, 100px);opacity:0} to{transform: translate(160px, -220px);opacity:1}}
+.w3-button
+{
+font: 15px sans-serif!important;text-decoration:none;border:none;display:inline-block;padding:12px 16px;vertical-align:middle;overflow:hidden;background-color:white;text-align:center;cursor:pointer;white-space:nowrap;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;
+}
+.w3-button:hover{color:#000!important;background-color:#ccc!important;}
+.w3-margin-right{margin-right:16px!important;}
+.w3-light-grey{color:#000!important;background-color:#f1f1f1!important;}
+.w3-xlarge{font-size:36px!important;}
+.w3-section{margin-top:16px!important;margin-bottom:16px!important;}
+.w3-hover-text-green:hover{color:#4CAF50!important}
+.w3-hover-opacity-off:hover{opacity:1}
+.w3-hover-opacity:hover{opacity:0.60}
+#adminlogin1, #adminlogin2
+{
+        margin-right: 10px;
+        text-align: right;
+        position: relative;
+        visibility: visible;
+}
+#adminlogin2
+{
+        display:none;
+}
+#div1a
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	transform: translate(190px, -130px);
+	visibility: visible;
+}
+#div2a
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:192px;
+	width:245px;
+	transform: translate(0px, -240px);
+	visibility: visible;
+}
+#div2b
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:240px;
+	width:350px;
+	transform: translate(170px, -180px);
+	overflow-y: hidden;
+	visibility: visible;
+}
+#div2c
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:192px;
+	width:245px;
+	transform: translate(30px, -310px);
+	visibility: hidden;
+}
+#div2d
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:435px;
+	width:330px;
+	transform: translate(160px, -220px);
+	overflow-y: hidden;
+	visibility: hidden;
+}
+#div2e, #div2f
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:60px;
+	width:370px;
+        display: none;
+}
+#div2e
+{
+	transform: translate(180px, -290px);
+}
+#div2f
+{
+	transform: translate(180px, 225px);
+}
+#div3a
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:192px;
+	width:245px;
+	transform: translate(-150px, -500px);
+}
+#div3b
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:880px;
+	width:580px;
+	line-height: 1.67619;
+	transform: translate(330px, -430px);
+        white-space: pre-wrap;
+}
+#div3c, #div3d
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:880px;
+	width:180px;
+}
+#div3c
+{
+	transform: translate(-200px, -430px);
+}
+#div3d
+{
+	transform: translate(350px, -430px);
+}
+#div3e, #div3f
+{
+	position:absolute;
+	top:50%;
+	right:50%;
+	height:220px;
+	width:360px;
+}
+#div3e
+{
+	transform: translate(165px, -430px);
+}
+#div3f
+{
+	transform: translate(165px, 230px);
+}
+</style>
+</head>
+
+<body>
+
+<section id="section1" title="scroll down and click on items to interact">
+<div class="bg-wrap">
+
+<div class="bg" style="background-image: url('http://1.bp.blogspot.com/_dxgHYHveZw8/TTXczKdB1rI/AAAAAAAAAFw/FSh0HnCQEu0/s800/BauhausCoffee.jpg');">
+</div>
+
+    <div id="adminlogin1"><span onclick="toggle_login()"><img src="login_icon.png"></span></div>
+    <div id="adminlogin2">
+	<form action="login.php" method="post">
+                <input type="text" placeholder="username" name="username" size="12"><br>
+	  	<br>
+	  	<input type="password" placeholder="password" name="password" size="12"><br><br>
+	  	<input type="submit" value="Submit">
+  		<input type="reset">
+	</form>
+    </div>
+    <div id="div1a"><img src="title_blur.png"/></div>
+    <audio controls autoplay style="visibility:hidden;">
+        <!--credit goes to: www.youtube.com/watch?v=HOfRnzRi89c and AudioTrimmer.com-->
+        <source src="Windchime_trim.ogg" type="audio/ogg">
+    </audio>
+    <audio id="letter_open" style="visibility:hidden;">
+        <source src="letter_open_2.ogg" type="audio/ogg">
+    </audio>
+
+</div>
+</section>
+
+
+<section id="section2">
+<div class="bg-wrap">
+
+<div class="bg" style="background-image: url('http://1.bp.blogspot.com/_dxgHYHveZw8/TTXczKdB1rI/AAAAAAAAAFw/FSh0HnCQEu0/s800/BauhausCoffee.jpg');">
+</div>
+
+	<div id="div2a"><img src="envolope_front.png"/ onClick="open_catalogue()" title="click to proceed"></div>
+	<div id="div2b" class="cataf" onClick="open_catalogue()" title="click to proceed"><i class="fa fa-spinner fa-spin"></i></div>
+	<div id="div2c"><img src="envolope_back.png"/ title="next page: click on letter top/bottom"></div>
+	<div id="div2d" title="proceed:click on chapters  next page:click on letter top/bottom">
+		<table>
+			<tr><td><i class="fa fa-spinner fa-spin"></i></td></tr>
+		</table>
+	</div>
+        <div id="div2e" onClick="open_cata(-1)" title="prev page"></div>
+	<div id="div2f" onClick="open_cata(1)" title="next page"></div>
+
+</div>
+</section>
+
+
+<section id="section3">
+<div class="bg-wrap">
+
+<div class="bg" style="background-image: url('http://1.bp.blogspot.com/_dxgHYHveZw8/TTXczKdB1rI/AAAAAAAAAFw/FSh0HnCQEu0/s800/BauhausCoffee.jpg');">
+</div>
+
+	<div id="div3a"><img src="letter_paper_2.png" style="height:1000px"/ title="next chapter:top/bottom  next page:left-side/right-side"></div>
+	<div id="div3b" class="cataf" title="next chapter:top/bottom  next page:left-side/right-side"><i class="fa fa-spinner fa-spin"></i></div>
+        <div id="div3c" onClick="open_letter(-1, -1)" title="prev chapter"></div>
+	<div id="div3d" onClick="open_letter(-1, 1)" title="next chapter"></div>
+        <div id="div3e" onClick="next_letter(-1)" title="prev page"></div>
+	<div id="div3f" onClick="next_letter(1)" title="next page"></div>
+
+</div>
+</section>
+
+<!-- Footer from w3schools-->
+<footer class="cataf">
+  <a href="#section1" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>To the top</a>
+  <div class="w3-xlarge w3-section">
+    <a id="twitter" href="_blank"><i class="fa fa-twitter w3-hover-opacity" style="color:white!important"></i></a>
+  </div>
+  <p style="color: white!important;">Powered by <a href="https://github.com/cyaaronk" title="cyaaronk" target="_blank" class="w3-hover-text-green" style="color: white!important;">cyaaronk</a></p>
+</footer>
+
+</body>
+</html>
